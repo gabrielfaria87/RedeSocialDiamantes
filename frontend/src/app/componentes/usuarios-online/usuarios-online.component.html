@@ -1,0 +1,24 @@
+<div class="usuarios-online-container">
+  <h3>👥 Usuários Online ({{usuariosOnline.length}})</h3>
+  
+  <div class="lista-usuarios">
+    <div class="usuario-item" *ngFor="let usuario of usuariosOnline">
+      <div class="info-usuario">
+        <span class="status-online"></span>
+        <img [src]="usuario.avatar" alt="Avatar" class="avatar-pequeno">
+        <span class="nome-usuario">{{usuario.nome}}</span>
+        <span class="badge-admin" *ngIf="usuario.isAdmin">ADMIN</span>
+      </div>
+      
+      <button *ngIf="usuarioLogado?.isAdmin && usuario.id !== usuarioLogado?.id" 
+              (click)="toggleStatusUsuario(usuario)"
+              class="btn-toggle-status">
+        {{usuario.isOnline ? 'Desconectar' : 'Conectar'}}
+      </button>
+    </div>
+  </div>
+
+  <div class="nenhum-usuario" *ngIf="usuariosOnline.length === 0">
+    <p>Nenhum usuário online no momento</p>
+  </div>
+</div>

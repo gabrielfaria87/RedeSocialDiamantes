@@ -1,0 +1,82 @@
+.usuarios-online-container {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
+}
+
+.usuarios-online-container h3 {
+  margin: 0 0 1rem 0;
+  color: #1877f2;
+  font-size: 1.1rem;
+}
+
+.lista-usuarios {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.usuario-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  border-bottom: 1px solid #f0f2f5;
+}
+
+.usuario-item:last-child {
+  border-bottom: none;
+}
+
+.info-usuario {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.status-online {
+  width: 8px;
+  height: 8px;
+  background-color: #42b883;
+  border-radius: 50%;
+}
+
+.avatar-pequeno {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
+.nome-usuario {
+  font-size: 0.9rem;
+}
+
+.badge-admin {
+  background-color: #1877f2;
+  color: white;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: bold;
+}
+
+.btn-toggle-status {
+  background-color: #f0f2f5;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.btn-toggle-status:hover {
+  background-color: #e4e6eb;
+}
+
+.nenhum-usuario {
+  text-align: center;
+  color: #65676b;
+  font-style: italic;
+  padding: 1rem;
+}

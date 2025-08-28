@@ -6,6 +6,7 @@
   <div class="menu" *ngIf="usuarioLogado">
     <button (click)="alternarAba('feed')" [class.ativo]="abaAtiva === 'feed'">Feed</button>
     <button (click)="alternarAba('chat')" [class.ativo]="abaAtiva === 'chat'">Chat</button>
+    <button (click)="alternarAba('perfil')" [class.ativo]="abaAtiva === 'perfil'">Perfil</button>
     <button (click)="alternarAba('admin')" [class.ativo]="abaAtiva === 'admin'" *ngIf="usuarioLogado.isAdmin">Admin</button>
   </div>
   

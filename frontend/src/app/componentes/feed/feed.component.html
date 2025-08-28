@@ -13,8 +13,14 @@
           <strong>{{publicacao.usuarioNome}}</strong>
           <span>{{formatarData(publicacao.data)}}</span>
         </div>
+        <button *ngIf="podeDeletar(publicacao)" 
+                (click)="deletarPublicacao(publicacao)"
+                class="btn-deletar">
+          🗑️
+        </button>
       </div>
       
+      <!-- Resto do conteúdo permanece igual -->
       <div class="conteudo-publicacao">
         {{publicacao.conteudo}}
       </div>

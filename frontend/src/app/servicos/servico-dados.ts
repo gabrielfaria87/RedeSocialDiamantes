@@ -21,7 +21,10 @@ export class ServicoDados {
 
   private usuarios: Usuario[] = [
     new Usuario(1, 'Administrador', 'admin@email.com', '', 'assets/avatar-padrao.jpg', true, true),
-    new Usuario(2, 'Usuário Teste', 'usuario@email.com', '', 'assets/avatar-padrao.jpg', true, false)
+    new Usuario(2, 'Usuário Teste', 'usuario@email.com', '', 'assets/avatar-padrao.jpg', true, false),
+    new Usuario(3, 'Maria Silva', 'maria@email.com', '', 'assets/avatar-padrao.jpg', true, false),
+    new Usuario(4, 'João Santos', 'joao@email.com', '', 'assets/avatar-padrao.jpg', false, false),
+    new Usuario(5, 'Ana Costa', 'ana@email.com', '', 'assets/avatar-padrao.jpg', true, false)
   ];
 
   constructor() {}
@@ -42,6 +45,15 @@ export class ServicoDados {
       []
     );
     this.publicacoes.unshift(novaPublicacao);
+  }
+
+  deletarPublicacao(id: number, usuarioId: number): boolean {
+    const index = this.publicacoes.findIndex(p => p.id === id && p.usuarioId === usuarioId);
+    if (index !== -1) {
+      this.publicacoes.splice(index, 1);
+      return true;
+    }
+    return false;
   }
 
   curtirPublicacao(id: number): void {
@@ -87,5 +99,20 @@ export class ServicoDados {
 
   getUsuarios(): Usuario[] {
     return this.usuarios;
+  }
+
+  getUsuariosOnline(): Usuario[] {
+    return this.usuarios.filter(u => u.isOnline);
+  }
+
+  toggleStatusUsuario(usuarioId: number): void {
+    const usuario = this.usuarios.find(u => u.id === usuarioId);
+    if (usuario) {
+      usuario.isOnline = !usuario.isOnline;
+    }
+  }
+
+  getUsuarioPorId(id: number): Usuario | undefined {
+    return this.usuarios.find(u => u.id === id);
   }
 }

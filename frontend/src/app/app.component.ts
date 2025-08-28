@@ -6,18 +6,22 @@ import { LoginComponent } from './componentes/login/login.component';
 import { FeedComponent } from './componentes/feed/feed.component';
 import { ChatComponent } from './componentes/chat/chat.component';
 import { AdminComponent } from './componentes/admin/admin.component';
+import { PerfilComponent } from './componentes/perfil/perfil.component';
+import { UsuariosOnlineComponent } from "./componentes/usuarios-online/usuarios-online.component";
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [
-    CommonModule, 
+    CommonModule,
     NavegacaoComponent,
     LoginComponent,
     FeedComponent,
     ChatComponent,
-    AdminComponent
-  ],
+    AdminComponent,
+    PerfilComponent,
+    UsuariosOnlineComponent
+],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
@@ -25,7 +29,7 @@ export class AppComponent {
   title = 'Rede Social do Curso';
   abaAtiva: string = 'feed';
 
-  constructor(private servicoAutenticacao: ServicoAutenticacao) {}
+  constructor(public servicoAutenticacao: ServicoAutenticacao) {}
 
   estaLogado(): boolean {
     return this.servicoAutenticacao.estaLogado();

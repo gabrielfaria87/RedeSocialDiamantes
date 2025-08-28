@@ -1,0 +1,72 @@
+<div class="perfil-container" *ngIf="usuario">
+  <div class="cabecalho-perfil">
+    <div class="info-usuario">
+      <img [src]="usuario.avatar" alt="Avatar" class="avatar-grande">
+      <div class="detalhes-usuario">
+        <h2>{{usuario.nome}}</h2>
+        <p>{{usuario.email}}</p>
+        <span class="status" [class.online]="usuario.isOnline">
+          {{usuario.isOnline ? '🟢 Online' : '🔴 Offline'}}
+        </span>
+        <span class="tipo-usuario" *ngIf="usuario.isAdmin">👑 Administrador</span>
+      </div>
+    </div>
+    
+    <button (click)="toggleEdicao()" class="btn-editar">
+      {{editando ? 'Cancelar' : '✏️ Editar Perfil'}}
+    </button>
+  </div>
+
+  <div class="form-edicao" *ngIf="editando">
+    <div class="form-group">
+      <label for="nome">Nome:</label>
+      <input type="text" id="nome" [(ngModel)]="novoNome">
+    </div>
+    
+    <div class="form-group">
+      <label for="avatar">URL do Avatar:</label>
+      <input type="text" id="avatar" [(ngModel)]="novoAvatar" placeholder="Cole a URL de uma imagem">
+    </div>
+    
+    <div class="acoes-form">
+      <button (click)="salvarPerfil()" class="btn-salvar">Salvar</button>
+      <button (click)="cancelarEdicao()" class="btn-cancelar">Cancelar</button>
+    </div>
+  </div>
+
+  <div class="estatisticas-perfil">
+    <div class="estatistica">
+      <span class="numero">{{publicacoesUsuario.length}}</span>
+      <span class="rotulo">Publicações</span>
+    </div>
+    <div class="estatistica">
+      <span class="numero">{{calcularTotalCurtidas()}}</span>
+      <span class="rotulo">Curtidas</span>
+    </div>
+    <div class="estatistica">
+      <span class="numero">{{calcularTotalComentarios()}}</span>
+      <span class="rotulo">Comentários</span>
+    </div>
+  </div>
+
+  <div class="publicacoes-perfil">
+    <h3>Suas Publicações</h3>
+    
+    <div class="lista-publicacoes">
+      <div class="publicacao-perfil" *ngFor="let publicacao of publicacoesUsuario">
+        <div class="conteudo-publicacao">
+          <p>{{publicacao.conteudo}}</p>
+          <span class="data-publicacao">{{formatarData(publicacao.data)}}</span>
+        </div>
+        <div class="estatisticas-publicacao">
+          <span>👍 {{publicacao.curtidas}}</span>
+          <span>💬 {{publicacao.comentarios.length}}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="nenhuma-publicacao" *ngIf="publicacoesUsuario.length === 0">
+      <p>Você ainda não fez nenhuma publicação</p>
+    </div>
+  </div>
+</div>
