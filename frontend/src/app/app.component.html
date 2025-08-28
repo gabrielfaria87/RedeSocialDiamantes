@@ -1,18 +1,5 @@
-<app-navegacao (abaSelecionada)="alternarAba($event)"></app-navegacao>
+<app-navegacao></app-navegacao>
 
 <main class="conteudo-principal">
-  <app-login *ngIf="!estaLogado()"></app-login>
-  
-  <div *ngIf="estaLogado()" class="conteudo-logado">
-    <div class="sidebar">
-      <app-usuarios-online [usuarioLogado]="servicoAutenticacao.getUsuarioLogado()"></app-usuarios-online>
-    </div>
-    
-    <div class="conteudo-principal">
-      <app-feed *ngIf="abaAtiva === 'feed'"></app-feed>
-      <app-chat *ngIf="abaAtiva === 'chat'"></app-chat>
-      <app-perfil *ngIf="abaAtiva === 'perfil'"></app-perfil>
-      <app-admin *ngIf="abaAtiva === 'admin' && isAdmin()"></app-admin>
-    </div>
-  </div>
+  <router-outlet></router-outlet>
 </main>

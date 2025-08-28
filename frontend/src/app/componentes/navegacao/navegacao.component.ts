@@ -1,21 +1,23 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router, RouterModule } from '@angular/router'; // Adicione RouterModule
 import { ServicoAutenticacao } from '../../servicos/servico-autenticacao';
 import { Usuario } from '../../modelos/modelo-usuario';
 
 @Component({
   selector: 'app-navegacao',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule], 
   templateUrl: './navegacao.component.html',
   styleUrl: './navegacao.component.css'
 })
 export class NavegacaoComponent {
   usuarioLogado: Usuario | null = null;
-  abaAtiva: string = 'feed';
-  @Output() abaSelecionada = new EventEmitter<string>();
 
-  constructor(private servicoAutenticacao: ServicoAutenticacao) {}
+  constructor(
+    private servicoAutenticacao: ServicoAutenticacao,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.usuarioLogado = this.servicoAutenticacao.getUsuarioLogado();
@@ -23,11 +25,10 @@ export class NavegacaoComponent {
 
   logout(): void {
     this.servicoAutenticacao.logout();
-    window.location.reload();
+    this.router.navigate(['/login']);
   }
 
-  alternarAba(aba: string): void {
-    this.abaAtiva = aba;
-    this.abaSelecionada.emit(aba);
+  isRotaAtiva(rota: string): boolean {
+    return this.router.url === `/${rota}`;
   }
 }

@@ -4,10 +4,11 @@
   </div>
   
   <div class="menu" *ngIf="usuarioLogado">
-    <button (click)="alternarAba('feed')" [class.ativo]="abaAtiva === 'feed'">Feed</button>
-    <button (click)="alternarAba('chat')" [class.ativo]="abaAtiva === 'chat'">Chat</button>
-    <button (click)="alternarAba('perfil')" [class.ativo]="abaAtiva === 'perfil'">Perfil</button>
-    <button (click)="alternarAba('admin')" [class.ativo]="abaAtiva === 'admin'" *ngIf="usuarioLogado.isAdmin">Admin</button>
+    <a routerLink="/feed" [class.ativo]="isRotaAtiva('feed')">feed</a>
+    <a routerLink="/forum" [class.ativo]="isRotaAtiva('forum')">Fórum</a>
+    <a routerLink="/chat" [class.ativo]="isRotaAtiva('chat')">Chat</a>
+    <a routerLink="/perfil" [class.ativo]="isRotaAtiva('perfil')">Perfil</a>
+    <a routerLink="/admin" [class.ativo]="isRotaAtiva('admin')" *ngIf="usuarioLogado.isAdmin">Admin</a>
   </div>
   
   <div class="usuario" *ngIf="usuarioLogado">

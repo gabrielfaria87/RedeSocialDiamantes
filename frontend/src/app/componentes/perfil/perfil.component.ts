@@ -11,7 +11,7 @@ import { Publicacao } from '../../modelos/modelo-publicacao';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './perfil.component.html',
-  styleUrl: './perfil.component.css'
+  styleUrls: ['./perfil.component.css'] // ⚠️ aqui era "styleUrl", o correto é "styleUrls"
 })
 export class PerfilComponent {
   usuario: Usuario | null = null;
@@ -37,16 +37,16 @@ export class PerfilComponent {
   carregarPublicacoesUsuario(): void {
     if (this.usuario) {
       this.publicacoesUsuario = this.servicoDados.getPublicacoes()
-        .filter(p => p.usuarioId === this.usuario!.id);
+        .filter((p: Publicacao) => p.usuarioId === this.usuario!.id);
     }
   }
 
-  toggleEdicao(): void {
-    this.editando = !this.editando;
-    if (this.editando && this.usuario) {
-      this.novoNome = this.usuario.nome;
-      this.novoAvatar = this.usuario.avatar;
-    }
+  calcularTotalCurtidas(): number {
+    return this.publicacoesUsuario.reduce((total: number, pub: Publicacao) => total + pub.curtidas, 0);
+  }
+
+  calcularTotalComentarios(): number {
+    return this.publicacoesUsuario.reduce((total: number, pub: Publicacao) => total + pub.comentarios.length, 0);
   }
 
   salvarPerfil(): void {
@@ -56,7 +56,7 @@ export class PerfilComponent {
       
       // Atualizar também nas publicações
       const publicacoes = this.servicoDados.getPublicacoes();
-      publicacoes.forEach(p => {
+      publicacoes.forEach((p: Publicacao) => {
         if (p.usuarioId === this.usuario!.id) {
           p.usuarioNome = this.novoNome;
           p.usuarioAvatar = this.novoAvatar;
@@ -68,6 +68,11 @@ export class PerfilComponent {
     }
   }
 
+  // 🔹 Métodos que estavam faltando
+  toggleEdicao(): void {
+    this.editando = !this.editando;
+  }
+
   cancelarEdicao(): void {
     this.editando = false;
     if (this.usuario) {
@@ -76,15 +81,12 @@ export class PerfilComponent {
     }
   }
 
-  formatarData(data: Date): string {
-    return new Date(data).toLocaleString('pt-BR');
+  formatarData(data: string | Date): string {
+    const d = new Date(data);
+    return d.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
   }
-
-  calcularTotalCurtidas(): number {
-  return this.publicacoesUsuario.reduce((total, pub) => total + pub.curtidas, 0);
-}
-
-calcularTotalComentarios(): number {
-  return this.publicacoesUsuario.reduce((total, pub) => total + pub.comentarios.length, 0);
-}
 }

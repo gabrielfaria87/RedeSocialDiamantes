@@ -1,0 +1,150 @@
+<div class="forum-container">
+  <!-- Lista de Tópicos -->
+  <div class="lista-topicos" *ngIf="!topicoSelecionado">
+    <div class="cabecalho-forum">
+      <h2>Fórum da Comunidade</h2>
+      <button (click)="criandoTopico = true" class="btn-novo-topico" *ngIf="usuarioLogado">
+        + Novo Tópico
+      </button>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filtros">
+      <button (click)="filtrarPorCategoria('Todas')" 
+              [class.ativo]="filtrandoCategoria === 'Todas'">
+        Todas
+      </button>
+      <button *ngFor="let categoria of categorias" 
+              (click)="filtrarPorCategoria(categoria.nome)"
+              [class.ativo]="filtrandoCategoria === categoria.nome">
+        {{categoria.icone}} {{categoria.nome}}
+      </button>
+    </div>
+
+    <!-- Formulário de Novo Tópico -->
+    <div class="criar-topico" *ngIf="criandoTopico">
+      <h3>Criar Novo Tópico</h3>
+      <div class="form-group">
+        <input type="text" [(ngModel)]="novoTopicTitulo" placeholder="Título do tópico">
+      </div>
+      <div class="form-group">
+        <textarea [(ngModel)]="novoTopicDescricao" placeholder="Descrição do tópico"></textarea>
+      </div>
+      <div class="form-group">
+        <select [(ngModel)]="novoTopicCategoria">
+          <option *ngFor="let cat of categorias" [value]="cat.nome">
+            {{cat.icone}} {{cat.nome}}
+          </option>
+        </select>
+      </div>
+      <div class="acoes-form">
+        <button (click)="criarNovoTopico()" class="btn-confirmar">Criar Tópico</button>
+        <button (click)="criandoTopico = false" class="btn-cancelar">Cancelar</button>
+      </div>
+    </div>
+
+    <!-- Tópicos Fixos -->
+    <div class="topicos-fixos" *ngIf="getTopicosFixos().length > 0">
+      <h3>📌 Tópicos Fixos</h3>
+      <div class="topico-item fixo" *ngFor="let topico of getTopicosFixos()" 
+           (click)="selecionarTopico(topico)">
+        <div class="info-topico">
+          <h4>{{topico.titulo}}</h4>
+          <p>{{topico.descricao}}</p>
+          <div class="meta-topico">
+            <span class="categoria">{{topico.categoria}}</span>
+            <span class="mensagens">💬 {{topico.mensagens.length}}</span>
+            <span class="criador">Por: {{topico.criadorNome}}</span>
+            <span class="data">{{formatarData(topico.dataCriacao)}}</span>
+          </div>
+        </div>
+        <div class="acoes-topico" *ngIf="usuarioLogado?.isAdmin" (click)="$event.stopPropagation()">
+          <button (click)="fixarTopico(topico)" class="btn-fixar">
+            📌 Desfixar
+          </button>
+          <button (click)="deletarTopico(topico)" class="btn-deletar" *ngIf="podeDeletarTopico(topico)">
+            🗑️
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tópicos Normais -->
+    <div class="topicos-normais">
+      <h3 *ngIf="getTopicosFixos().length > 0">📋 Todos os Tópicos</h3>
+      <div class="topico-item" *ngFor="let topico of getTopicosNormais()" 
+           (click)="selecionarTopico(topico)">
+        <div class="info-topico">
+          <h4>{{topico.titulo}}</h4>
+          <p>{{topico.descricao}}</p>
+          <div class="meta-topico">
+            <span class="categoria">{{topico.categoria}}</span>
+            <span class="mensagens">💬 {{topico.mensagens.length}}</span>
+            <span class="criador">Por: {{topico.criadorNome}}</span>
+            <span class="data">{{formatarData(topico.dataCriacao)}}</span>
+          </div>
+        </div>
+        <div class="acoes-topico" (click)="$event.stopPropagation()">
+          <button (click)="fixarTopico(topico)" class="btn-fixar" *ngIf="usuarioLogado?.isAdmin">
+            📌 Fixar
+          </button>
+          <button (click)="deletarTopico(topico)" class="btn-deletar" *ngIf="podeDeletarTopico(topico)">
+            🗑️
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="nenhum-topico" *ngIf="topicos.length === 0">
+      <p>Nenhum tópico encontrado. Seja o primeiro a criar um!</p>
+    </div>
+  </div>
+
+  <!-- Visualização do Tópico -->
+  <div class="visualizacao-topico" *ngIf="topicoSelecionado">
+    <div class="cabecalho-topico">
+      <button (click)="voltarParaLista()" class="btn-voltar">← Voltar</button>
+      <h2>{{topicoSelecionado.titulo}}</h2>
+      <span class="categoria-topico">{{topicoSelecionado.categoria}}</span>
+    </div>
+
+    <div class="descricao-topico">
+      <p>{{topicoSelecionado.descricao}}</p>
+      <div class="info-criador">
+        <img [src]="topicoSelecionado.criadorAvatar" alt="Avatar" class="avatar-pequeno">
+        <span>Criado por {{topicoSelecionado.criadorNome}} em {{formatarData(topicoSelecionado.dataCriacao)}}</span>
+      </div>
+    </div>
+
+    <div class="mensagens-topico">
+      <h3>Mensagens ({{topicoSelecionado.mensagens.length}})</h3>
+      
+      <div class="lista-mensagens">
+        <div class="mensagem-item" *ngFor="let mensagem of topicoSelecionado.mensagens">
+          <img [src]="mensagem.usuarioAvatar" alt="Avatar" class="avatar-pequeno">
+          <div class="conteudo-mensagem">
+            <div class="cabecalho-mensagem">
+              <strong>{{mensagem.usuarioNome}}</strong>
+              <span class="data-mensagem">{{formatarData(mensagem.data)}}</span>
+            </div>
+            <p>{{mensagem.conteudo}}</p>
+            <div class="acoes-mensagem">
+              <button (click)="curtirMensagem(mensagem)" class="btn-curtir">
+                👍 {{mensagem.curtidas}}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="nenhuma-mensagem" *ngIf="topicoSelecionado.mensagens.length === 0">
+        <p>Seja o primeiro a responder este tópico!</p>
+      </div>
+    </div>
+
+    <div class="enviar-mensagem" *ngIf="usuarioLogado">
+      <textarea [(ngModel)]="novaMensagem" placeholder="Escreva sua resposta..."></textarea>
+      <button (click)="enviarMensagem()" [disabled]="!novaMensagem.trim()">Enviar</button>
+    </div>
+  </div>
+</div>

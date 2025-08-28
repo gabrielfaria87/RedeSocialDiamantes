@@ -13,6 +13,7 @@ import { Usuario } from '../../modelos/modelo-usuario';
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css'
 })
+
 export class ChatComponent {
   usuarios: Usuario[] = [];
   usuarioSelecionado: Usuario | null = null;
@@ -27,11 +28,12 @@ export class ChatComponent {
 
   ngOnInit(): void {
     this.usuarioLogado = this.servicoAutenticacao.getUsuarioLogado();
-    this.usuarios = this.servicoDados.getUsuarios().filter(u => u.id !== this.usuarioLogado?.id);
-    
-    // Selecionar o primeiro usuário por padrão
-    if (this.usuarios.length > 0) {
-      this.selecionarUsuario(this.usuarios[0]);
+    if (this.usuarioLogado) {
+      this.usuarios = this.servicoDados.getUsuarios().filter((u: Usuario) => u.id !== this.usuarioLogado?.id);
+      
+      if (this.usuarios.length > 0) {
+        this.selecionarUsuario(this.usuarios[0]);
+      }
     }
   }
 
@@ -39,11 +41,11 @@ export class ChatComponent {
     this.usuarioSelecionado = usuario;
     if (this.usuarioLogado) {
       this.mensagens = this.servicoDados.getMensagens(this.usuarioLogado.id)
-        .filter(m => 
+        .filter((m: Mensagem) => 
           (m.remetenteId === usuario.id && m.destinatarioId === this.usuarioLogado!.id) ||
           (m.remetenteId === this.usuarioLogado!.id && m.destinatarioId === usuario.id)
         )
-        .sort((a, b) => new Date(a.data).getTime() - new Date(b.data).getTime());
+        .sort((a: Mensagem, b: Mensagem) => new Date(a.data).getTime() - new Date(b.data).getTime());
     }
   }
 
