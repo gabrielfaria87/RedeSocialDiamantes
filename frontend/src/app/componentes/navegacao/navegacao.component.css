@@ -7,8 +7,21 @@
   color: white;
 }
 
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 5px; /* Cria um espaço entre a logo e o texto */
+}
+
 .logo h2 {
   margin: 0;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.logo-nav {
+  height: 50px; /* Ajuste a altura como preferir */
+  width: auto;
+  filter: drop-shadow(1px 1px 3px rgba(0, 0, 0, 0.4));
 }
 
 .menu {
