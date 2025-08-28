@@ -1,0 +1,50 @@
+<div class="feed-container">
+  <div class="criar-publicacao">
+    <h3>O que você está pensando?</h3>
+    <textarea [(ngModel)]="novaPublicacao" placeholder="Compartilhe algo com a turma..."></textarea>
+    <button (click)="publicar()">Publicar</button>
+  </div>
+
+  <div class="publicacoes">
+    <div class="publicacao" *ngFor="let publicacao of publicacoes">
+      <div class="cabecalho-publicacao">
+        <img [src]="publicacao.usuarioAvatar" alt="Avatar" class="avatar">
+        <div class="info-usuario">
+          <strong>{{publicacao.usuarioNome}}</strong>
+          <span>{{formatarData(publicacao.data)}}</span>
+        </div>
+      </div>
+      
+      <div class="conteudo-publicacao">
+        {{publicacao.conteudo}}
+      </div>
+      
+      <div class="acoes-publicacao">
+        <button (click)="curtir(publicacao)" class="btn-curtir">
+          👍 Curtir ({{publicacao.curtidas}})
+        </button>
+        <button (click)="toggleComentarios(publicacao.id)" class="btn-comentar">
+          💬 Comentar ({{publicacao.comentarios.length}})
+        </button>
+      </div>
+      
+      <div class="comentarios" *ngIf="comentarioAtivo === publicacao.id">
+        <div class="novo-comentario">
+          <textarea [(ngModel)]="novoComentario" placeholder="Escreva um comentário..."></textarea>
+          <button (click)="comentar(publicacao)">Comentar</button>
+        </div>
+        
+        <div class="lista-comentarios">
+          <div class="comentario" *ngFor="let comentario of publicacao.comentarios">
+            <img [src]="comentario.usuarioAvatar" alt="Avatar" class="avatar-pequeno">
+            <div class="conteudo-comentario">
+              <strong>{{comentario.usuarioNome}}</strong>
+              <p>{{comentario.conteudo}}</p>
+              <small>{{formatarData(comentario.data)}}</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

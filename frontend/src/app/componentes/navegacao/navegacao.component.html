@@ -1,0 +1,17 @@
+<nav class="navegacao">
+  <div class="logo">
+    <h2>Rede Social do Curso</h2>
+  </div>
+  
+  <div class="menu" *ngIf="usuarioLogado">
+    <button (click)="alternarAba('feed')" [class.ativo]="abaAtiva === 'feed'">Feed</button>
+    <button (click)="alternarAba('chat')" [class.ativo]="abaAtiva === 'chat'">Chat</button>
+    <button (click)="alternarAba('admin')" [class.ativo]="abaAtiva === 'admin'" *ngIf="usuarioLogado.isAdmin">Admin</button>
+  </div>
+  
+  <div class="usuario" *ngIf="usuarioLogado">
+    <img [src]="usuarioLogado.avatar" alt="Avatar" class="avatar">
+    <span>Olá, {{usuarioLogado.nome}}</span>
+    <button (click)="logout()">Sair</button>
+  </div>
+</nav>

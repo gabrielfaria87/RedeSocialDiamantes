@@ -1,0 +1,11 @@
+<app-navegacao></app-navegacao>
+
+<main class="conteudo-principal">
+  <app-login *ngIf="!estaLogado()"></app-login>
+  
+  <div *ngIf="estaLogado()">
+    <app-feed *ngIf="abaAtiva === 'feed'"></app-feed>
+    <app-chat *ngIf="abaAtiva === 'chat'"></app-chat>
+    <app-admin *ngIf="abaAtiva === 'admin' && isAdmin()"></app-admin>
+  </div>
+</main>

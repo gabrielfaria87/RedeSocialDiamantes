@@ -1,0 +1,49 @@
+<div class="chat-container">
+  <div class="lista-contatos">
+    <h3>Conversas</h3>
+    <div class="contato" 
+         *ngFor="let usuario of usuarios" 
+         [class.selecionado]="usuarioSelecionado?.id === usuario.id"
+         (click)="selecionarUsuario(usuario)">
+      <img [src]="usuario.avatar" alt="Avatar" class="avatar">
+      <div class="info-contato">
+        <strong>{{usuario.nome}}</strong>
+        <span *ngIf="usuario.isOnline" class="online">Online</span>
+        <span *ngIf="!usuario.isOnline" class="offline">Offline</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="area-conversa" *ngIf="usuarioSelecionado">
+    <div class="cabecalho-conversa">
+      <img [src]="usuarioSelecionado.avatar" alt="Avatar" class="avatar">
+      <div class="info-conversa">
+        <strong>{{usuarioSelecionado.nome}}</strong>
+        <span>{{usuarioSelecionado.isOnline ? 'Online' : 'Offline'}}</span>
+      </div>
+    </div>
+
+    <div class="mensagens">
+      <div class="mensagem" 
+           *ngFor="let mensagem of mensagens" 
+           [class.enviada]="mensagem.remetenteId === usuarioLogado?.id">
+        <div class="conteudo-mensagem">
+          <p>{{mensagem.conteudo}}</p>
+          <span class="hora">{{formatarData(mensagem.data)}}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="entrada-mensagem">
+      <input type="text" 
+             [(ngModel)]="novaMensagem" 
+             placeholder="Digite uma mensagem..."
+             (keyup.enter)="enviarMensagem()">
+      <button (click)="enviarMensagem()">Enviar</button>
+    </div>
+  </div>
+
+  <div class="nenhum-contato" *ngIf="!usuarioSelecionado">
+    <p>Selecione um contato para iniciar uma conversa</p>
+  </div>
+</div>
