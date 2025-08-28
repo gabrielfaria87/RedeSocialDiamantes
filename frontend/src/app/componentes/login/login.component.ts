@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
 import { ServicoAutenticacao } from '../../servicos/servico-autenticacao';
 
 @Component({
@@ -16,17 +15,13 @@ export class LoginComponent {
   senha: string = '';
   erro: string = '';
 
-  constructor(
-    private servicoAutenticacao: ServicoAutenticacao,
-    private router: Router
-  ) {}
+  constructor(private servicoAutenticacao: ServicoAutenticacao) {}
 
   login(): void {
     this.erro = '';
-    if (this.servicoAutenticacao.login(this.email, this.senha)) {
-      this.router.navigate(['/feed']);
-    } else {
+    if (!this.servicoAutenticacao.login(this.email, this.senha)) {
       this.erro = 'Email ou senha incorretos';
     }
+    // A navegação agora é feita pelo ServicoAutenticacao
   }
 }
