@@ -16,11 +16,11 @@ export const createPost = async (req: Request, res: Response) => {
         if (!user) return res.status(401).json({ erro: 'Não autenticado' });
         const { conteudo } = req.body;
         if (!conteudo) return res.status(400).json({ erro: 'Conteúdo obrigatório' });
-    const authed = getAuthedClient(req);
-    const { data, error } = await authed
+        const authed = getAuthedClient(req);
+        const { data, error } = await authed
             .from('publicacoes')
             .insert({ conteudo, usuario_id: user.id })
-            .select('*')
+            .select('id, conteudo, created_at, usuario_id, usuarios:usuario_id(id, nome, avatar_url)')
             .single();
         if (error) return res.status(400).json({ erro: error.message });
         res.status(201).json(data);
@@ -34,27 +34,45 @@ export const getPosts = async (req: Request, res: Response) => {
     try {
         const user = (req as any).user;
         const authed = user ? getAuthedClient(req) : supabase;
-        const { data, error } = await authed
+        const { data: posts, error } = await authed
             .from('publicacoes')
-            .select('id, conteudo, created_at, usuario_id, usuarios:usuario_id(id, nome, avatar_url), likes:likes(count), user_like:likes!inner(id, usuario_id)')
+            .select('id, conteudo, created_at, usuario_id, usuarios:usuario_id(id, nome, avatar_url), likes:likes(count)')
             .order('created_at', { ascending: false });
-        if (error) {
-            // fallback sem join user_like se policy bloquear
-            const fallback = await authed
-              .from('publicacoes')
-              .select('id, conteudo, created_at, usuario_id, usuarios:usuario_id(id, nome, avatar_url), likes:likes(count)')
-              .order('created_at', { ascending: false });
-            if (fallback.error) return res.status(400).json({ erro: fallback.error.message });
-            return res.json(fallback.data);
+        if (error) return res.status(400).json({ erro: error.message });
+
+        let likedSet = new Set<string>();
+        if (user) {
+            const { data: myLikes } = await authed
+                .from('likes')
+                .select('post_id')
+                .eq('usuario_id', user.id);
+            if (Array.isArray(myLikes)) {
+                likedSet = new Set(myLikes.map(l => (l as any).post_id));
+            }
         }
-        // Filtrar user_like somente do usuário logado
-        const mapped = (data || []).map((p: any) => {
-            const liked = Array.isArray(p.user_like) ? p.user_like.some((l: any) => l.usuario_id === user?.id) : false;
-            delete p.user_like;
-            p.liked = liked;
-            return p;
-        });
+
+        const mapped = (posts || []).map(p => ({ ...p, liked: likedSet.has((p as any).id) }));
         res.json(mapped);
+    } catch (e: any) {
+        res.status(500).json({ erro: e.message });
+    }
+};
+
+// GET /api/posts/mine
+export const getMyPosts = async (req: Request, res: Response) => {
+    try {
+        const user = (req as any).user;
+        if (!user) return res.status(401).json({ erro: 'Não autenticado' });
+        const authed = getAuthedClient(req);
+        const { data: posts, error } = await authed
+            .from('publicacoes')
+            .select('id, conteudo, created_at, usuario_id, usuarios:usuario_id(id, nome, avatar_url), likes:likes(count)')
+            .eq('usuario_id', user.id)
+            .order('created_at', { ascending: false });
+        if (error) return res.status(400).json({ erro: error.message });
+        const { data: myLikes } = await authed.from('likes').select('post_id').eq('usuario_id', user.id);
+        const likedSet = new Set((myLikes || []).map(l => (l as any).post_id));
+        res.json((posts || []).map(p => ({ ...p, liked: likedSet.has((p as any).id) })));
     } catch (e: any) {
         res.status(500).json({ erro: e.message });
     }

@@ -76,11 +76,27 @@ export class FeedComponent {
   toggleComentarios(publicacaoId: string): void {
     this.comentarioAtivo = this.comentarioAtivo === publicacaoId ? null : publicacaoId;
     this.novoComentario = '';
+    if (this.comentarioAtivo) {
+      const pub = this.publicacoes.find(p => p.id === this.comentarioAtivo);
+      if (pub) {
+        this.servicoDados.listarComentarios(pub.id).subscribe({
+          next: cs => pub.comentarios = cs,
+          error: _ => console.error('Falha ao listar comentários')
+        });
+      }
+    }
   }
 
-  comentar(_publicacao: Publicacao): void {
-    // Comentários ainda não implementados na API
-    alert('Comentários ainda não implementados na API.');
+  comentar(publicacao: Publicacao): void {
+    if (!this.novoComentario.trim()) return;
+    const texto = this.novoComentario;
+    this.novoComentario = '';
+    this.servicoDados.criarComentario(publicacao.id, texto).subscribe({
+      next: c => {
+        publicacao.comentarios = [...publicacao.comentarios, c];
+      },
+      error: _ => alert('Falha ao comentar')
+    });
   }
 
   formatarData(data: Date): string {

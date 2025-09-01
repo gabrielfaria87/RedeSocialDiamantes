@@ -37,11 +37,9 @@ export class PerfilComponent {
 
   carregarPublicacoesUsuario(): void {
     if (!this.usuario) return;
-    this.servicoDados.listarPublicacoes().subscribe({
-      next: pubs => {
-        this.publicacoesUsuario = pubs; // TODO: filtrar quando API retornar usuario_id
-      },
-      error: _ => console.error('Erro ao carregar publicações do usuário')
+    this.servicoDados.listarMinhasPublicacoes().subscribe({
+      next: pubs => { this.publicacoesUsuario = pubs; },
+      error: _ => console.error('Erro ao carregar minhas publicações')
     });
   }
 

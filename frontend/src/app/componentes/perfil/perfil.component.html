@@ -1,22 +1,34 @@
 <div class="perfil-container" *ngIf="usuario">
   <div class="cabecalho-perfil">
     <div class="info-usuario">
-      <img [src]="usuario.avatar" alt="Avatar" class="avatar-grande">
+      <ng-container *ngIf="usuario.avatar; else perfilAvatarPadrao">
+        <img [src]="usuario.avatar" alt="Avatar" class="avatar-grande">
+      </ng-container>
+      <ng-template #perfilAvatarPadrao>
+        <div class="avatar-grande avatar-fallback d-flex align-items-center justify-content-center">
+          <i class="bi bi-person-circle"></i>
+        </div>
+      </ng-template>
       <div class="detalhes-usuario">
         <h2>{{usuario.nome}}</h2>
         <p>{{usuario.email}}</p>
-        <span class="status" [class.online]="usuario.isOnline">
-          {{usuario.isOnline ? '🟢 Online' : '🔴 Offline'}}
+        <span class="status d-inline-flex align-items-center" [class.online]="usuario.isOnline">
+          <i class="bi" [ngClass]="usuario.isOnline ? 'bi-circle-fill text-success' : 'bi-circle-fill text-danger'"></i>
+          <span class="ms-1">{{usuario.isOnline ? 'Online' : 'Offline'}}</span>
         </span>
         <button class="btn-toggle-status" (click)="toggleStatusOnline()" [disabled]="atualizandoStatus">
-          {{ usuario.isOnline ? 'Ficar Offline' : 'Ficar Online' }}
+          <i class="bi" [ngClass]="usuario.isOnline ? 'bi-toggle-off' : 'bi-toggle-on'"></i>
+          <span class="ms-1">{{ usuario.isOnline ? 'Ficar Offline' : 'Ficar Online' }}</span>
         </button>
-        <span class="tipo-usuario" *ngIf="usuario.isAdmin">👑 Administrador</span>
+        <span class="tipo-usuario d-inline-flex align-items-center" *ngIf="usuario.isAdmin">
+          <i class="bi bi-shield-lock-fill me-1"></i> Administrador
+        </span>
       </div>
     </div>
     
     <button (click)="toggleEdicao()" class="btn-editar">
-      {{editando ? 'Cancelar' : '✏️ Editar Perfil'}}
+      <i class="bi" [ngClass]="editando ? 'bi-x-circle' : 'bi-pencil-square'"></i>
+      <span class="ms-1">{{editando ? 'Cancelar' : 'Editar Perfil'}}</span>
     </button>
   </div>
 
@@ -39,16 +51,19 @@
 
   <div class="estatisticas-perfil">
     <div class="estatistica">
-      <span class="numero">{{publicacoesUsuario.length}}</span>
-      <span class="rotulo">Publicações</span>
+      <i class="bi bi-journal-text"></i>
+      <span class="numero ms-1">{{publicacoesUsuario.length}}</span>
+      <span class="rotulo d-block">Publicações</span>
     </div>
     <div class="estatistica">
-      <span class="numero">{{calcularTotalCurtidas()}}</span>
-      <span class="rotulo">Curtidas</span>
+      <i class="bi bi-hand-thumbs-up"></i>
+      <span class="numero ms-1">{{calcularTotalCurtidas()}}</span>
+      <span class="rotulo d-block">Curtidas</span>
     </div>
     <div class="estatistica">
-      <span class="numero">{{calcularTotalComentarios()}}</span>
-      <span class="rotulo">Comentários</span>
+      <i class="bi bi-chat-dots"></i>
+      <span class="numero ms-1">{{calcularTotalComentarios()}}</span>
+      <span class="rotulo d-block">Comentários</span>
     </div>
   </div>
 
@@ -62,8 +77,8 @@
           <span class="data-publicacao">{{formatarData(publicacao.data)}}</span>
         </div>
         <div class="estatisticas-publicacao">
-          <span>👍 {{publicacao.curtidas}}</span>
-          <span>💬 {{publicacao.comentarios.length}}</span>
+          <span class="me-3"><i class="bi bi-hand-thumbs-up"></i> {{publicacao.curtidas}}</span>
+          <span><i class="bi bi-chat-dots"></i> {{publicacao.comentarios.length}}</span>
         </div>
       </div>
     </div>

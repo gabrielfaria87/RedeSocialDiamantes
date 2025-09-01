@@ -8,7 +8,14 @@
   <div class="publicacoes">
     <div class="publicacao" *ngFor="let publicacao of publicacoes">
       <div class="cabecalho-publicacao">
-        <img [src]="publicacao.usuarioAvatar" alt="Avatar" class="avatar">
+        <ng-container *ngIf="publicacao.usuarioAvatar; else avatarPadrao">
+          <img [src]="publicacao.usuarioAvatar" alt="Avatar" class="avatar">
+        </ng-container>
+        <ng-template #avatarPadrao>
+          <div class="avatar avatar-fallback d-flex align-items-center justify-content-center">
+            <i class="bi bi-person-circle"></i>
+          </div>
+        </ng-template>
         <div class="info-usuario">
           <strong>{{publicacao.usuarioNome}}</strong>
           <span>{{formatarData(publicacao.data)}}</span>
@@ -16,7 +23,7 @@
         <button *ngIf="podeDeletar(publicacao)" 
                 (click)="deletarPublicacao(publicacao)"
                 class="btn-deletar">
-          🗑️
+          <i class="bi bi-trash"></i>
         </button>
       </div>
       
@@ -27,10 +34,12 @@
       
       <div class="acoes-publicacao">
         <button (click)="curtir(publicacao)" class="btn-curtir">
-          👍 Curtir ({{publicacao.curtidas}})
+          <i class="bi" [ngClass]="publicacao.liked ? 'bi-hand-thumbs-up-fill text-primary' : 'bi-hand-thumbs-up'"></i>
+          <span class="ms-1">Curtir ({{publicacao.curtidas}})</span>
         </button>
         <button (click)="toggleComentarios(publicacao.id)" class="btn-comentar">
-          💬 Comentar ({{publicacao.comentarios.length}})
+          <i class="bi bi-chat-dots"></i>
+          <span class="ms-1">Comentários ({{publicacao.comentarios.length}})</span>
         </button>
       </div>
       
@@ -42,7 +51,14 @@
         
         <div class="lista-comentarios">
           <div class="comentario" *ngFor="let comentario of publicacao.comentarios">
-            <img [src]="comentario.usuarioAvatar" alt="Avatar" class="avatar-pequeno">
+            <ng-container *ngIf="comentario.usuarioAvatar; else comentarioAvatarPadrao">
+              <img [src]="comentario.usuarioAvatar" alt="Avatar" class="avatar-pequeno">
+            </ng-container>
+            <ng-template #comentarioAvatarPadrao>
+              <div class="avatar-pequeno avatar-fallback d-flex align-items-center justify-content-center">
+                <i class="bi bi-person-fill"></i>
+              </div>
+            </ng-template>
             <div class="conteudo-comentario">
               <strong>{{comentario.usuarioNome}}</strong>
               <p>{{comentario.conteudo}}</p>

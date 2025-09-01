@@ -55,6 +55,37 @@ create table if not exists public.likes (
 
 alter table public.likes enable row level security;
 
+-- Tabela de comentários
+create table if not exists public.comentarios (
+    id uuid primary key default gen_random_uuid(),
+    post_id uuid references public.publicacoes(id) on delete cascade not null,
+    usuario_id uuid references public.usuarios(id) on delete cascade not null,
+    conteudo text not null,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+alter table public.comentarios enable row level security;
+
+-- ================== FÓRUM ==================
+create table if not exists public.forum_topics (
+    id uuid primary key default gen_random_uuid(),
+    titulo text not null,
+    descricao text not null,
+    categoria text default 'Geral',
+    criador_id uuid references public.usuarios(id) on delete cascade not null,
+    is_fixo boolean default false,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+alter table public.forum_topics enable row level security;
+
+create table if not exists public.forum_messages (
+    id uuid primary key default gen_random_uuid(),
+    topico_id uuid references public.forum_topics(id) on delete cascade not null,
+    usuario_id uuid references public.usuarios(id) on delete cascade not null,
+    conteudo text not null,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+alter table public.forum_messages enable row level security;
+
 -- Policies para usuários
 -- Policies de usuarios (idempotentes via DO blocks)
 DO $$ BEGIN
@@ -98,6 +129,42 @@ DO $$ BEGIN
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 DO $$ BEGIN
     CREATE POLICY "Usuários podem remover seus likes" ON public.likes FOR DELETE USING (auth.uid() = usuario_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+-- Policies comentários
+DO $$ BEGIN
+    CREATE POLICY "Ver comentários" ON public.comentarios FOR SELECT USING (true);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+    CREATE POLICY "Criar comentário" ON public.comentarios FOR INSERT WITH CHECK (auth.role() = 'authenticated' and auth.uid() = usuario_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+    CREATE POLICY "Deletar próprio comentário" ON public.comentarios FOR DELETE USING (auth.uid() = usuario_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+-- Policies forum topics
+DO $$ BEGIN
+    CREATE POLICY "Ver tópicos" ON public.forum_topics FOR SELECT USING (true);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+    CREATE POLICY "Criar tópico" ON public.forum_topics FOR INSERT WITH CHECK (auth.role() = 'authenticated' and auth.uid() = criador_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+    CREATE POLICY "Editar/Deletar próprio tópico" ON public.forum_topics FOR UPDATE USING (auth.uid() = criador_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+    CREATE POLICY "Deletar próprio tópico" ON public.forum_topics FOR DELETE USING (auth.uid() = criador_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+-- Policies forum messages
+DO $$ BEGIN
+    CREATE POLICY "Ver mensagens" ON public.forum_messages FOR SELECT USING (true);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+    CREATE POLICY "Enviar mensagem" ON public.forum_messages FOR INSERT WITH CHECK (auth.role() = 'authenticated' and auth.uid() = usuario_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+    CREATE POLICY "Deletar própria mensagem" ON public.forum_messages FOR DELETE USING (auth.uid() = usuario_id);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- Funções para gerenciar status online

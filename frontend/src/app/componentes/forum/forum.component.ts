@@ -18,6 +18,9 @@ export class ForumComponent {
   categorias: CategoriaForum[] = [];
   topicoSelecionado: TopicoForum | null = null;
   usuarioLogado: Usuario | null = null;
+  carregandoTopicos: boolean = false;
+  carregandoMensagens: boolean = false;
+  erroTopicos: string | null = null;
   
   // Variáveis para criar novo tópico
   criandoTopico: boolean = false;
@@ -41,14 +44,27 @@ export class ForumComponent {
   }
 
   carregarTopicos(): void {
-    this.topicos = this.servicoDados.getTopicosForum();
-    if (this.filtrandoCategoria !== 'Todas') {
-      this.topicos = this.topicos.filter(t => t.categoria === this.filtrandoCategoria);
-    }
+    this.carregandoTopicos = true;
+    this.erroTopicos = null;
+    this.servicoDados.listarTopicos$().subscribe({
+      next: lista => {
+        this.topicos = this.filtrandoCategoria === 'Todas'
+          ? lista
+          : lista.filter(t => t.categoria === this.filtrandoCategoria);
+      },
+      error: _ => this.erroTopicos = 'Falha ao carregar tópicos',
+      complete: () => this.carregandoTopicos = false
+    });
   }
 
   selecionarTopico(topico: TopicoForum): void {
     this.topicoSelecionado = topico;
+    this.carregandoMensagens = true;
+    this.servicoDados.listarMensagensTopico$(topico.id).subscribe({
+      next: msgs => { if (this.topicoSelecionado && this.topicoSelecionado.id === topico.id) this.topicoSelecionado.mensagens = msgs; },
+      error: _ => console.error('Falha ao carregar mensagens'),
+      complete: () => this.carregandoMensagens = false
+    });
   }
 
   voltarParaLista(): void {
@@ -58,68 +74,59 @@ export class ForumComponent {
 
   criarNovoTopico(): void {
     if (this.novoTopicTitulo.trim() && this.novoTopicDescricao.trim() && this.usuarioLogado) {
-      this.servicoDados.criarTopico(
-        this.novoTopicTitulo,
-        this.novoTopicDescricao,
-        this.novoTopicCategoria,
-        this.usuarioLogado
-      );
-      
-      this.novoTopicTitulo = '';
-      this.novoTopicDescricao = '';
-      this.novoTopicCategoria = 'Geral';
-      this.criandoTopico = false;
-      this.carregarTopicos();
+      this.servicoDados.criarTopico(this.novoTopicTitulo, this.novoTopicDescricao, this.novoTopicCategoria, this.usuarioLogado)
+        .subscribe({
+          next: topico => {
+            // Insere no topo
+            this.topicos = [topico, ...this.topicos];
+            this.criandoTopico = false;
+            this.novoTopicTitulo = '';
+            this.novoTopicDescricao = '';
+            this.novoTopicCategoria = 'Geral';
+          },
+          error: _ => alert('Falha ao criar tópico')
+        });
     }
   }
 
   enviarMensagem(): void {
     if (this.novaMensagem.trim() && this.topicoSelecionado && this.usuarioLogado) {
-      this.servicoDados.adicionarMensagemForum(
-        this.topicoSelecionado.id,
-        this.novaMensagem,
-        this.usuarioLogado
-      );
+      const texto = this.novaMensagem;
       this.novaMensagem = '';
-      
-      // Atualizar o tópico selecionado
-      const topicoAtualizado = this.servicoDados.getTopicoPorId(this.topicoSelecionado.id);
-      if (topicoAtualizado) {
-        this.topicoSelecionado = topicoAtualizado;
-      }
+      const idTopico = this.topicoSelecionado.id;
+      this.servicoDados.adicionarMensagemForum(idTopico, texto, this.usuarioLogado)
+        .subscribe({
+          next: msg => {
+            if (this.topicoSelecionado && this.topicoSelecionado.id === idTopico) {
+              this.topicoSelecionado.mensagens = [...this.topicoSelecionado.mensagens, msg];
+            }
+          },
+          error: _ => alert('Falha ao enviar mensagem')
+        });
     }
   }
 
   curtirMensagem(mensagem: MensagemForum): void {
-    if (this.topicoSelecionado) {
-      this.servicoDados.curtirMensagemForum(this.topicoSelecionado.id, mensagem.id);
-      
-      // Atualizar o tópico selecionado
-      const topicoAtualizado = this.servicoDados.getTopicoPorId(this.topicoSelecionado.id);
-      if (topicoAtualizado) {
-        this.topicoSelecionado = topicoAtualizado;
-      }
-    }
+    alert('Curtir mensagem ainda não implementado');
   }
 
   deletarTopico(topico: TopicoForum): void {
   if (this.usuarioLogado && (topico.criadorId === this.usuarioLogado.id || this.usuarioLogado.isAdmin)) {
       const confirmacao = confirm('Tem certeza que deseja excluir este tópico?');
       if (confirmacao) {
-  this.servicoDados.deletarTopico(topico.id, this.usuarioLogado.id);
-        this.carregarTopicos();
-        if (this.topicoSelecionado?.id === topico.id) {
-          this.voltarParaLista();
-        }
+        this.servicoDados.deletarTopico(topico.id, this.usuarioLogado.id).subscribe({
+          next: () => {
+            this.topicos = this.topicos.filter(t => t.id !== topico.id);
+            if (this.topicoSelecionado?.id === topico.id) this.voltarParaLista();
+          },
+          error: _ => alert('Falha ao deletar tópico')
+        });
       }
     }
   }
 
   fixarTopico(topico: TopicoForum): void {
-    if (this.usuarioLogado?.isAdmin) {
-      this.servicoDados.fixarTopico(topico.id);
-      this.carregarTopicos();
-    }
+    alert('Fixar tópico ainda não implementado');
   }
 
   filtrarPorCategoria(categoria: string): void {

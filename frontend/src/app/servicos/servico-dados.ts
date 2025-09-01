@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../environments/environment';
-import { Publicacao } from '../modelos/modelo-publicacao';
+import { Publicacao, Comentario } from '../modelos/modelo-publicacao';
 import { Usuario } from '../modelos/modelo-usuario';
 import { TopicoForum, MensagemForum, CategoriaForum } from '../modelos/modelo-forum';
 import { Mensagem } from '../modelos/modelo-mensagem';
@@ -12,6 +12,9 @@ import { map, Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class ServicoDados {
+  curtirMensagemForum(id: string, id1: string) {
+    throw new Error('Method not implemented.');
+  }
   constructor(private http: HttpClient, private auth: ServicoAutenticacao) {}
 
   private headers(): HttpHeaders { return new HttpHeaders({ 'Authorization': `Bearer ${this.auth.getToken()}` }); }
@@ -33,6 +36,22 @@ export class ServicoDados {
             !!r.liked
           );
       }))
+    );
+  }
+
+  listarMinhasPublicacoes(): Observable<Publicacao[]> {
+    return this.http.get<any[]>(`${environment.apiUrl}/posts/mine`, { headers: this.headers() }).pipe(
+      map(rows => rows.map(r => new Publicacao(
+        r.id,
+        r.usuario_id,
+        r.usuarios?.nome || 'Você',
+        r.usuarios?.avatar_url || 'assets/avatar-padrao.jpg',
+        r.conteudo,
+        new Date(r.created_at),
+        (Array.isArray(r.likes) && r.likes.length ? r.likes[0].count : 0) || 0,
+        [],
+        !!r.liked
+      )))
     );
   }
 
@@ -62,15 +81,103 @@ export class ServicoDados {
     return this.http.delete(`${environment.apiUrl}/posts/${id}/like`, { headers: this.headers() });
   }
 
+  listarComentarios(postId: string): Observable<Comentario[]> {
+    return this.http.get<any[]>(`${environment.apiUrl}/posts/${postId}/comments`, { headers: this.headers() })
+      .pipe(map(rows => rows.map(r => new Comentario(
+        r.id,
+        r.usuario_id,
+        r.usuarios?.nome || '',
+        r.usuarios?.avatar_url || 'assets/avatar-padrao.jpg',
+        r.conteudo,
+        new Date(r.created_at)
+      ))));
+  }
+
+  criarComentario(postId: string, conteudo: string): Observable<Comentario> {
+    return this.http.post<any>(`${environment.apiUrl}/posts/${postId}/comments`, { conteudo }, { headers: this.headers() })
+      .pipe(map(r => new Comentario(
+        r.id,
+        r.usuario_id,
+        r.usuarios?.nome || '',
+        r.usuarios?.avatar_url || 'assets/avatar-padrao.jpg',
+        r.conteudo,
+        new Date(r.created_at)
+      )));
+  }
+
+  deletarComentario(postId: string, comentarioId: string): Observable<void> {
+    return this.http.delete<void>(`${environment.apiUrl}/posts/${postId}/comments/${comentarioId}`, { headers: this.headers() });
+  }
+
   // ====== Stubs temporários para fórum / usuários (evita erros de compilação) ======
   getCategoriasForum(): CategoriaForum[] { return []; }
-  getTopicosForum(): TopicoForum[] { return []; }
+
+  getTopicosForum(): TopicoForum[] { return []; } // legado local (não usado após API)
   getTopicoPorId(_id: string): TopicoForum | undefined { return undefined; }
-  criarTopico(_t: string, _d: string, _c: string, _u: Usuario): void { /* TODO implementar */ }
-  adicionarMensagemForum(_topicoId: string, _conteudo: string, _u: Usuario): void { /* TODO */ }
-  curtirMensagemForum(_topicoId: string, _mensagemId: string): void { /* TODO */ }
-  deletarTopico(_id: string, _usuarioId: string): boolean { return false; }
-  fixarTopico(_id: string): void { /* TODO */ }
+
+  listarTopicos$(): Observable<TopicoForum[]> {
+    return this.http.get<any[]>(`${environment.apiUrl}/forum/topics`).pipe(
+      map(rows => rows.map(r => new TopicoForum(
+        r.id,
+        r.titulo,
+        r.descricao,
+        r.criador_id,
+        r.usuarios?.nome || '',
+        r.usuarios?.avatar_url || 'assets/avatar-padrao.jpg',
+        new Date(r.created_at),
+        [],
+        r.is_fixo,
+        r.categoria || 'Geral'
+      )))
+    );
+  }
+
+  criarTopico(titulo: string, descricao: string, categoria: string, _u: Usuario): Observable<TopicoForum> {
+    return this.http.post<any>(`${environment.apiUrl}/forum/topics`, { titulo, descricao, categoria }, { headers: this.headers() }).pipe(
+      map(r => new TopicoForum(
+        r.id, r.titulo, r.descricao, r.criador_id,
+        r.usuarios?.nome || '', r.usuarios?.avatar_url || 'assets/avatar-padrao.jpg',
+        new Date(r.created_at), [], r.is_fixo, r.categoria || 'Geral'
+      ))
+    );
+  }
+
+  listarMensagensTopico$(topicoId: string): Observable<MensagemForum[]> {
+    return this.http.get<any[]>(`${environment.apiUrl}/forum/topics/${topicoId}/messages`).pipe(
+      map(rows => rows.map(r => new MensagemForum(
+        r.id,
+        r.topico_id,
+        r.usuario_id,
+        r.usuarios?.nome || '',
+        r.usuarios?.avatar_url || 'assets/avatar-padrao.jpg',
+        r.conteudo,
+        new Date(r.created_at),
+        0
+      )))
+    );
+  }
+
+  adicionarMensagemForum(topicoId: string, conteudo: string, _u: Usuario): Observable<MensagemForum> {
+    return this.http.post<any>(`${environment.apiUrl}/forum/topics/${topicoId}/messages`, { conteudo }, { headers: this.headers() }).pipe(
+      map(r => new MensagemForum(
+        r.id,
+        r.topico_id,
+        r.usuario_id,
+        r.usuarios?.nome || '',
+        r.usuarios?.avatar_url || 'assets/avatar-padrao.jpg',
+        r.conteudo,
+        new Date(r.created_at),
+        0
+      ))
+    );
+  }
+
+  deletarTopico(id: string, _usuarioId: string): Observable<void> {
+    return this.http.delete<void>(`${environment.apiUrl}/forum/topics/${id}`, { headers: this.headers() });
+  }
+
+  // fixarTopico: não implementado no backend ainda
+  fixarTopico(_id: string): void {}
 
   // (Futuras funções para usuários, chat e fórum podem ser reimplementadas com API real aqui)
 
