@@ -199,6 +199,12 @@ export class ServicoDados {
   atualizarStatusOnline(online: boolean): Observable<any> {
     return this.http.patch(`${environment.apiUrl}/users/me/status`, { online }, { headers: this.headers() });
   }
+  // Retorna usuários online simples (placeholder local até endpoint dedicado)
+  getUsuariosOnline(): Usuario[] {
+    // Ideal: consumir endpoint /users?online=1; fallback: retorna usuário logado se online
+    const u = this.auth.getUsuarioLogado();
+    return u && u.isOnline ? [u] : [];
+  }
   getMensagens(_usuarioId: string): Mensagem[] { return []; }
   listarMensagens(otherUserId: string): Observable<Mensagem[]> {
     return this.http.get<any[]>(`${environment.apiUrl}/chat/${otherUserId}/messages`, { headers: this.headers() }).pipe(

@@ -84,6 +84,7 @@ export const authController = {
         try {
             const { email, senha } = req.body as LoginDTO;
             if (!email || !senha) return res.status(400).json({ erro: 'Informe email e senha' });
+            console.log('[LOGIN] tentativa', { email });
             const { data, error } = await supabase.auth.signInWithPassword({ email, password: senha });
             if (error) {
                 console.error('[login] error:', error);
@@ -110,9 +111,10 @@ export const authController = {
             }
             // Atualiza status online (sempre)
             await supabase.from('usuarios').update({ is_online: true, last_seen: new Date().toISOString() }).eq('id', userId);
-
+            console.log('[LOGIN] sucesso', { userId, perfilEncontrado: !!perfil });
             res.json({ token: data.session.access_token, usuario: perfil });
         } catch (e: any) {
+            console.error('[LOGIN] exceção', e);
             res.status(500).json({ erro: e.message });
         }
     },

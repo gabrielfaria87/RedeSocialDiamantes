@@ -25,9 +25,30 @@ export class UsuariosOnlineComponent {
   }
 
   toggleStatusUsuario(usuario: Usuario): void {
-    if (this.usuarioLogado?.isAdmin) {
-      this.servicoDados.toggleStatusUsuario(usuario.id);
-      this.carregarUsuariosOnline();
+    if (!this.usuarioLogado?.isAdmin) return;
+    // Apenas demonstração: se fosse outro usuário, backend precisaria de endpoint admin.
+    // Aqui só inverte localmente se for o próprio usuário logado.
+    if (usuario.id === this.usuarioLogado.id) {
+      const novo = !usuario.isOnline;
+      this.servicoDados.atualizarStatusOnline(novo).subscribe({
+        next: () => { usuario.isOnline = novo; this.carregarUsuariosOnline(); },
+        error: () => { usuario.isOnline = novo; this.carregarUsuariosOnline(); }
+      });
     }
+  }
+
+  ficarOffline(): void {
+    if (!this.usuarioLogado) return;
+    this.servicoDados.atualizarStatusOnline(false).subscribe({
+      next: () => {
+        if (this.usuarioLogado) this.usuarioLogado.isOnline = false;
+        this.carregarUsuariosOnline();
+      },
+      error: () => {
+        // fallback visual
+        if (this.usuarioLogado) this.usuarioLogado.isOnline = false;
+        this.carregarUsuariosOnline();
+      }
+    });
   }
 }
