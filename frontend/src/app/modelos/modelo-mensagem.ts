@@ -1,9 +1,9 @@
 export class Mensagem {
   constructor(
-    public id: number = 0,
-    public remetenteId: number = 0,
+  public id: string = '',
+  public remetenteId: string = '',
     public remetenteNome: string = '',
-    public destinatarioId: number = 0,
+  public destinatarioId: string = '',
     public conteudo: string = '',
     public data: Date = new Date(),
     public lida: boolean = false

@@ -8,6 +8,9 @@
         <span class="status" [class.online]="usuario.isOnline">
           {{usuario.isOnline ? '🟢 Online' : '🔴 Offline'}}
         </span>
+        <button class="btn-toggle-status" (click)="toggleStatusOnline()" [disabled]="atualizandoStatus">
+          {{ usuario.isOnline ? 'Ficar Offline' : 'Ficar Online' }}
+        </button>
         <span class="tipo-usuario" *ngIf="usuario.isAdmin">👑 Administrador</span>
       </div>
     </div>

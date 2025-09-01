@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ServicoDados } from '../../servicos/servico-dados';
 import { ServicoAutenticacao } from '../../servicos/servico-autenticacao';
-import { Usuario } from '../../modelos/modelo-usuario';
 import { Publicacao } from '../../modelos/modelo-publicacao';
 
 @Component({
@@ -13,7 +12,7 @@ import { Publicacao } from '../../modelos/modelo-publicacao';
   styleUrl: './admin.component.css'
 })
 export class AdminComponent {
-  usuarios: Usuario[] = [];
+  usuarios: any[] = []; // TODO: implementar fetch real de usuários
   publicacoes: Publicacao[] = [];
   estatisticas: any = {};
 
@@ -24,9 +23,10 @@ export class AdminComponent {
 
   ngOnInit(): void {
     if (this.servicoAutenticacao.isAdmin()) {
-      this.usuarios = this.servicoDados.getUsuarios();
-      this.publicacoes = this.servicoDados.getPublicacoes();
-      this.calcularEstatisticas();
+      this.servicoDados.listarPublicacoes().subscribe({
+        next: pubs => { this.publicacoes = pubs; this.calcularEstatisticas(); },
+        error: _ => console.error('Erro ao carregar publicações')
+      });
     }
   }
 
@@ -34,24 +34,33 @@ export class AdminComponent {
     this.estatisticas = {
       totalUsuarios: this.usuarios.length,
       totalPublicacoes: this.publicacoes.length,
-      totalCurtidas: this.publicacoes.reduce((total, pub) => total + pub.curtidas, 0),
-      totalComentarios: this.publicacoes.reduce((total, pub) => total + pub.comentarios.length, 0),
-      usuariosOnline: this.usuarios.filter(u => u.isOnline).length
+  totalCurtidas: this.publicacoes.reduce((total, pub) => total + pub.curtidas, 0),
+  totalComentarios: 0,
+  usuariosOnline: 0
     };
   }
 
-  alternarStatusUsuario(usuario: Usuario): void {
-    usuario.isOnline = !usuario.isOnline;
-  }
-
-  alternarAdmin(usuario: Usuario): void {
-    if (usuario.id !== 1) { // Não permitir remover admin do usuário principal
-      usuario.isAdmin = !usuario.isAdmin;
+  excluirPublicacao(pub: Publicacao): void {
+    if (confirm('Excluir publicação?')) {
+      // Backend exige ID; se for UUID já funciona
+      this.servicoDados.deletarPublicacao(String(pub.id)).subscribe({
+        next: () => {
+          this.publicacoes = this.publicacoes.filter(p => p.id !== pub.id);
+          this.calcularEstatisticas();
+        },
+        error: _ => alert('Erro ao excluir')
+      });
     }
   }
 
-  excluirPublicacao(publicacao: Publicacao): void {
-    this.publicacoes = this.publicacoes.filter(p => p.id !== publicacao.id);
+  // Stubs temporários até implementação real de usuários
+  alternarStatusUsuario(usuario: any): void {
+    usuario.isOnline = !usuario.isOnline;
     this.calcularEstatisticas();
+  }
+
+  alternarAdmin(usuario: any): void {
+    if (usuario.id === 1) return; // preserva super admin
+    usuario.isAdmin = !usuario.isAdmin;
   }
 }

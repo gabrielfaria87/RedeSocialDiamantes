@@ -1,9 +1,9 @@
 export class TopicoForum {
   constructor(
-    public id: number = 0,
+  public id: string = '',
     public titulo: string = '',
     public descricao: string = '',
-    public criadorId: number = 0,
+  public criadorId: string = '',
     public criadorNome: string = '',
     public criadorAvatar: string = '',
     public dataCriacao: Date = new Date(),
@@ -15,9 +15,9 @@ export class TopicoForum {
 
 export class MensagemForum {
   constructor(
-    public id: number = 0,
-    public topicoId: number = 0,
-    public usuarioId: number = 0,
+  public id: string = '',
+  public topicoId: string = '',
+  public usuarioId: string = '',
     public usuarioNome: string = '',
     public usuarioAvatar: string = '',
     public conteudo: string = '',
@@ -28,7 +28,7 @@ export class MensagemForum {
 
 export class CategoriaForum {
   constructor(
-    public id: number = 0,
+  public id: string = '',
     public nome: string = '',
     public descricao: string = '',
     public icone: string = '💬'

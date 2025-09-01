@@ -19,6 +19,7 @@ export class PerfilComponent {
   editando: boolean = false;
   novoNome: string = '';
   novoAvatar: string = '';
+  atualizandoStatus: boolean = false;
 
   constructor(
     private servicoAutenticacao: ServicoAutenticacao,
@@ -35,10 +36,13 @@ export class PerfilComponent {
   }
 
   carregarPublicacoesUsuario(): void {
-    if (this.usuario) {
-      this.publicacoesUsuario = this.servicoDados.getPublicacoes()
-        .filter((p: Publicacao) => p.usuarioId === this.usuario!.id);
-    }
+    if (!this.usuario) return;
+    this.servicoDados.listarPublicacoes().subscribe({
+      next: pubs => {
+        this.publicacoesUsuario = pubs; // TODO: filtrar quando API retornar usuario_id
+      },
+      error: _ => console.error('Erro ao carregar publicações do usuário')
+    });
   }
 
   calcularTotalCurtidas(): number {
@@ -54,18 +58,22 @@ export class PerfilComponent {
       this.usuario.nome = this.novoNome;
       this.usuario.avatar = this.novoAvatar;
       
-      // Atualizar também nas publicações
-      const publicacoes = this.servicoDados.getPublicacoes();
-      publicacoes.forEach((p: Publicacao) => {
-        if (p.usuarioId === this.usuario!.id) {
-          p.usuarioNome = this.novoNome;
-          p.usuarioAvatar = this.novoAvatar;
-        }
-      });
+  // TODO: Chamar endpoint de atualização de perfil (não implementado ainda)
       
       this.editando = false;
       alert('Perfil atualizado com sucesso!');
     }
+  }
+
+  toggleStatusOnline(): void {
+    if (!this.usuario || this.atualizandoStatus) return;
+    this.atualizandoStatus = true;
+    const novo = !this.usuario.isOnline;
+    this.servicoDados.atualizarStatusOnline(novo).subscribe({
+      next: () => { if (this.usuario) this.usuario.isOnline = novo; },
+      error: _ => alert('Falha ao atualizar status'),
+      complete: () => this.atualizandoStatus = false
+    });
   }
 
   // 🔹 Métodos que estavam faltando

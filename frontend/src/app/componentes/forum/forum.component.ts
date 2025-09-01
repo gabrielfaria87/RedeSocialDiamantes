@@ -103,10 +103,10 @@ export class ForumComponent {
   }
 
   deletarTopico(topico: TopicoForum): void {
-    if (this.usuarioLogado && (topico.criadorId === this.usuarioLogado.id || this.usuarioLogado.isAdmin)) {
+  if (this.usuarioLogado && (topico.criadorId === this.usuarioLogado.id || this.usuarioLogado.isAdmin)) {
       const confirmacao = confirm('Tem certeza que deseja excluir este tópico?');
       if (confirmacao) {
-        this.servicoDados.deletarTopico(topico.id, this.usuarioLogado.id);
+  this.servicoDados.deletarTopico(topico.id, this.usuarioLogado.id);
         this.carregarTopicos();
         if (this.topicoSelecionado?.id === topico.id) {
           this.voltarParaLista();

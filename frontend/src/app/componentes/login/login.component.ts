@@ -13,15 +13,55 @@ import { ServicoAutenticacao } from '../../servicos/servico-autenticacao';
 export class LoginComponent {
   email: string = '';
   senha: string = '';
+  nome: string = '';
   erro: string = '';
+  modoRegistro: boolean = false;
 
   constructor(private servicoAutenticacao: ServicoAutenticacao) {}
 
   login(): void {
     this.erro = '';
-    if (!this.servicoAutenticacao.login(this.email, this.senha)) {
-      this.erro = 'Email ou senha incorretos';
+    if (!this.email.trim() || !this.senha.trim()) {
+      this.erro = 'Preencha email e senha';
+      return;
     }
-    // A navegação agora é feita pelo ServicoAutenticacao
+    this.servicoAutenticacao.login(this.email, this.senha).subscribe({
+      error: (e) => {
+        this.erro = e?.error?.erro || 'Falha no login';
+      }
+    });
+  }
+
+  toggleModo(): void {
+    this.modoRegistro = !this.modoRegistro;
+    this.erro = '';
+  }
+
+  registrar(): void {
+    this.erro = '';
+    if (!this.nome.trim() || !this.email.trim() || !this.senha.trim()) {
+      this.erro = 'Preencha nome, email e senha';
+      return;
+    }
+    this.servicoAutenticacao.registro(this.nome, this.email, this.senha).subscribe({
+      next: resp => {
+        if (resp?.token) {
+          // Se backend já retornou token, faz login rápido reutilizando fluxo padrão
+          this.servicoAutenticacao.login(this.email, this.senha).subscribe({
+            error: _ => this.erro = 'Erro ao logar após registro'
+          });
+        } else if (resp?.requiresEmailConfirmation) {
+          this.erro = 'Confirme seu email antes de logar.';
+        } else {
+          // fallback
+          this.servicoAutenticacao.login(this.email, this.senha).subscribe({
+            error: _ => this.erro = 'Erro ao logar após registro'
+          });
+        }
+      },
+      error: (e) => {
+        this.erro = e?.error?.erro || 'Erro no registro';
+      }
+    });
   }
 }

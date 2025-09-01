@@ -1,27 +1,38 @@
 <div class="login-container">
   <div class="login-card">
-    <img src="/logo.jpg" alt="Logo da Rede Social" class="login-logo">
-    
-    <div class="form-group">
-      <label for="email">Email:</label>
-      <input type="email" id="email" [(ngModel)]="email" placeholder="Seu email">
-    </div>
-    
-    <div class="form-group">
-      <label for="senha">Senha:</label>
-      <input type="password" id="senha" [(ngModel)]="senha" placeholder="Sua senha">
-    </div>
-    
-    <div class="erro" *ngIf="erro">{{erro}}</div>
-    
-    <button (click)="login()">Entrar</button>
-    
-    <div class="dicas">
-      <p>Dicas de login:</p>
-      <ul>
-        <li>Admin: admin&#64;email.com / admin123</li>
-        <li>Usuário: usuario&#64;email.com / user123</li>
-      </ul>
-    </div>
+<h2 *ngIf="!modoRegistro">Login</h2>
+<h2 *ngIf="modoRegistro">Registrar</h2>
+
+<div *ngIf="modoRegistro" class="form-group">
+  <label for="nome">Nome:</label>
+  <input id="nome" [(ngModel)]="nome" placeholder="Seu nome">
+</div>
+
+<div class="form-group">
+  <label for="email">Email:</label>
+  <input type="email" id="email" [(ngModel)]="email" placeholder="Seu email">
+</div>
+
+<div class="form-group">
+  <label for="senha">Senha:</label>
+  <input type="password" id="senha" [(ngModel)]="senha" placeholder="Sua senha">
+</div>
+
+<div class="erro" *ngIf="erro">{{erro}}</div>
+
+<button *ngIf="!modoRegistro" (click)="login()">Entrar</button>
+<button *ngIf="modoRegistro" (click)="registrar()">Registrar</button>
+
+<button type="button" class="toggle" (click)="toggleModo()">
+  {{ modoRegistro ? 'Já tenho conta' : 'Criar nova conta' }}
+</button>
+
+<div class="dicas" *ngIf="!modoRegistro">
+  <p>Dicas de login:</p>
+  <ul>
+    <li>Admin: admin&#64;email.com / admin123</li>
+    <li>Usuário: usuario&#64;email.com / user123</li>
+  </ul>
+</div>
   </div>
 </div>

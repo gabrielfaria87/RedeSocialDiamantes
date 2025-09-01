@@ -29,31 +29,34 @@ export class ChatComponent {
   ngOnInit(): void {
     this.usuarioLogado = this.servicoAutenticacao.getUsuarioLogado();
     if (this.usuarioLogado) {
-      this.usuarios = this.servicoDados.getUsuarios().filter((u: Usuario) => u.id !== this.usuarioLogado?.id);
-      
-      if (this.usuarios.length > 0) {
-        this.selecionarUsuario(this.usuarios[0]);
-      }
+      this.servicoDados.getUsuarios$().subscribe({
+        next: lista => {
+          this.usuarios = lista.filter(u => u.id !== this.usuarioLogado!.id);
+          if (this.usuarios.length > 0) this.selecionarUsuario(this.usuarios[0]);
+        },
+        error: _ => console.error('Falha ao carregar usuários')
+      });
     }
   }
 
   selecionarUsuario(usuario: Usuario): void {
     this.usuarioSelecionado = usuario;
     if (this.usuarioLogado) {
-      this.mensagens = this.servicoDados.getMensagens(this.usuarioLogado.id)
-        .filter((m: Mensagem) => 
-          (m.remetenteId === usuario.id && m.destinatarioId === this.usuarioLogado!.id) ||
-          (m.remetenteId === this.usuarioLogado!.id && m.destinatarioId === usuario.id)
-        )
-        .sort((a: Mensagem, b: Mensagem) => new Date(a.data).getTime() - new Date(b.data).getTime());
+      this.servicoDados.listarMensagens(usuario.id).subscribe({
+        next: msgs => this.mensagens = msgs,
+        error: _ => console.error('Falha ao carregar mensagens')
+      });
     }
   }
 
   enviarMensagem(): void {
     if (this.novaMensagem.trim() && this.usuarioSelecionado && this.usuarioLogado) {
-      this.servicoDados.enviarMensagem(this.usuarioLogado, this.usuarioSelecionado.id, this.novaMensagem);
+      const texto = this.novaMensagem;
       this.novaMensagem = '';
-      this.selecionarUsuario(this.usuarioSelecionado); // Recarregar mensagens
+      this.servicoDados.enviarMensagem(this.usuarioLogado, this.usuarioSelecionado.id, texto).subscribe({
+        next: msg => { this.mensagens = [...this.mensagens, msg]; },
+        error: _ => alert('Erro ao enviar mensagem')
+      });
     }
   }
 
