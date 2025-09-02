@@ -1,2 +1,79 @@
-/* Placeholder galeria - estilos mínimos */
-.container { min-height:60vh; }
+/* CSS da navbar (copiado de navegacao.component.css) */
+.logo-nav {
+  height: 42px;
+  width: auto;
+}
+.usuario .avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.navbar-nav .nav-link.active {
+  font-weight: 600;
+  text-decoration: underline;
+}
+.navbar {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+/* Estilo do container principal */
+.container {
+  min-height: 60vh;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+/* Carrossel */
+.carousel {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: #fff;
+  margin-bottom: 2rem;
+}
+.carousel-inner {
+  width: 100%;
+  display: flex;
+}
+.carousel-img {
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  height: 300px;
+  object-fit: cover;
+}
+
+/* Cards de fotos */
+.card {
+  border-radius: 10px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
+  background: #fff;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.card:hover {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 4px 16px rgba(24, 119, 242, 0.1);
+}
+.card-img-top {
+  border-radius: 10px 10px 0 0;
+  height: 200px;
+  object-fit: cover;
+}
+.card-title {
+  font-size: 1.1rem;
+  color: #1877f2;
+  font-weight: 600;
+  margin-bottom: 0;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .carousel-img {
+    height: 180px;
+  }
+  .card-img-top {
+    height: 120px;
+  }
+  .container {
+    padding: 1rem 0.5rem;
+  }
+}

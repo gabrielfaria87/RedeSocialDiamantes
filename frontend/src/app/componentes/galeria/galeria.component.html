@@ -1,1 +1,104 @@
-<div class="container py-5"><!-- vazio intencionalmente --></div>
+<!-- Navbar da tela de login -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary px-3">
+  <a class="navbar-brand d-flex align-items-center" routerLink="/feed">
+    <img src="/logo.png" alt="Logo CADSPM" class="logo-nav me-2" />
+    <span class="fw-semibold">CADSPM</span>
+  </a>
+  <button
+    class="navbar-toggler"
+    type="button"
+    data-bs-toggle="collapse"
+    data-bs-target="#mainNav"
+    aria-controls="mainNav"
+    aria-expanded="false"
+    aria-label="Toggle navigation"
+  >
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="mainNav">
+    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/home"
+          ><i class="bi bi-house-heart me-1"></i>Home</a
+        >
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/feed"
+          ><i class="bi bi-house-door me-1"></i>Feed</a
+        >
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/forum"
+          ><i class="bi bi-chat-left-text me-1"></i>Fórum</a
+        >
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/chat"
+          ><i class="bi bi-messenger me-1"></i>Chat</a
+        >
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/galeria"
+          ><i class="bi bi-images me-1"></i>Galeria</a
+        >
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/perfil"
+          ><i class="bi bi-person-circle me-1"></i>Perfil</a
+        >
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<div class="container py-5">
+  <!-- Formulário para adicionar nova foto -->
+  <form (submit)="adicionarFoto()" class="mb-4 d-flex gap-2 align-items-center">
+    <input
+      type="text"
+      [(ngModel)]="novaFotoUrl"
+      name="novaFotoUrl"
+      class="form-control"
+      placeholder="URL da nova foto"
+      required
+    />
+    <input
+      type="text"
+      [(ngModel)]="novaDescricao"
+      name="novaDescricao"
+      class="form-control"
+      placeholder="Descrição curta"
+      maxlength="60"
+      required
+    />
+    <button type="submit" class="btn btn-primary">Adicionar foto</button>
+  </form>
+
+  <!-- Carrossel dinâmico -->
+  <div class="carousel">
+    <div
+      class="carousel-inner"
+      [style.transform]="'translateX(-' + carouselIndex * 100 + '%)'"
+    >
+      <img
+        *ngFor="let foto of fotos.slice(0, 5)"
+        [src]="foto.url"
+        class="carousel-img"
+        [alt]="foto.descricao"
+      />
+    </div>
+  </div>
+
+  <!-- Cards dinâmicos -->
+  <div class="row mt-5">
+    <div class="col-md-3 mb-4" *ngFor="let foto of fotos; let idx = index">
+      <div class="card h-100 shadow-sm">
+        <img [src]="foto.url" class="card-img-top" [alt]="foto.descricao" />
+        <div class="card-body">
+          <h5 class="card-title">Foto {{ idx + 1 }}</h5>
+          <p class="card-text">{{ foto.descricao }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

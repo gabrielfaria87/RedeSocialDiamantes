@@ -8,11 +8,13 @@ import { AdminComponent } from './componentes/admin/admin.component';
 import { AuthGuard } from './guards/auth.guard';
 import { HomeComponent } from './componentes/home/home.component';
 import { GaleriaComponent } from './componentes/galeria/galeria.component';
+import { DiamantesComponent } from './componentes/diamantes/diamantes.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'home', component: HomeComponent },
   { path: 'galeria', component: GaleriaComponent, canActivate: [AuthGuard] },
+  { path: 'diamantes', component: DiamantesComponent, canActivate: [AuthGuard] },
   { path: 'feed', component: FeedComponent, canActivate: [AuthGuard] },
   { path: 'forum', component: ForumComponent, canActivate: [AuthGuard] },
   { path: 'chat', component: ChatComponent, canActivate: [AuthGuard] },

@@ -1,0 +1,60 @@
+
+
+<!-- Navbar padrão enxuta -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary px-3">
+  <a class="navbar-brand d-flex align-items-center" routerLink="/feed">
+    <img src="/logo.png" alt="Logo CADSPM" class="logo-nav me-2" />
+    <span class="fw-semibold">CADSPM</span>
+  </a>
+  <button
+    class="navbar-toggler"
+    type="button"
+    data-bs-toggle="collapse"
+    data-bs-target="#mainNav"
+    aria-controls="mainNav"
+    aria-expanded="false"
+    aria-label="Toggle navigation"
+  >
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="mainNav">
+    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/home"><i class="bi bi-house-heart me-1"></i>Home</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/feed"><i class="bi bi-house-door me-1"></i>Feed</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/forum"><i class="bi bi-chat-left-text me-1"></i>Fórum</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/chat"><i class="bi bi-messenger me-1"></i>Chat</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/galeria"><i class="bi bi-images me-1"></i>Galeria</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/diamantes"><i class="bi bi-gem me-1"></i>Diamantes</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/perfil"><i class="bi bi-person-circle me-1"></i>Perfil</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<div class="diamantes-container">
+  <h2>Diamantes</h2>
+  <div class="row">
+    <div class="col-md-3 mb-4" *ngFor="let card of cards">
+      <div class="card h-100 shadow-sm">
+        <img [src]="card.foto" class="card-img-top" alt="Diamante">
+        <div class="card-body">
+          <h5 class="card-title">{{card.descricao}}</h5>
+          <p class="card-text">{{card.texto}}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
